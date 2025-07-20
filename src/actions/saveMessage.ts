@@ -1,7 +1,7 @@
 "use server";
 import { kv } from '@vercel/kv';
 import { nanoid } from 'nanoid';
-import { Message } from '../types';
+import { Message } from '../../types';
 
 export async function saveMessage(formData: FormData) {
   const cardId = formData.get('cardId') as string;
