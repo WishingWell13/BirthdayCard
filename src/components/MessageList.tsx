@@ -65,7 +65,7 @@ export default function MessageList({ cardId, recipientName, messages, isRecipie
               )}
               <div className="font-semibold text-blue-700">{msg.authorName}</div>
             </div>
-            <div className="mt-2 text-gray-800">{msg.messageText}</div>
+            <div className="mt-2 text-gray-800 whitespace-pre-wrap">{msg.messageText}</div>
           </li>
         ))}
       </ul>

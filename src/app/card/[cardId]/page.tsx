@@ -1,4 +1,4 @@
-import MessageList from '../../../components/MessageList';
+import BubbleDisplay from '../../../components/BubbleDisplay';
 import { kv } from '@vercel/kv';
 import { Card, Message } from '@/types';
 
@@ -22,18 +22,11 @@ export default async function CardViewPage({ params }: { params: Promise<{ cardI
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-pink-50 p-8">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-pink-900 mb-6 text-center">
-          Happy Birthday, {card.recipientName}!
-        </h1>
-        <MessageList
-          cardId={cardId}
-          recipientName={card.recipientName}
-          messages={messages}
-          isRecipient={true}
-        />
-      </div>
+    <main className="w-screen h-screen bg-gradient-to-br from-blue-50 to-pink-50 relative">
+      <h1 className="absolute top-8 left-1/2 transform -translate-x-1/2 text-3xl font-bold text-pink-900 mb-6 text-center z-20">
+        Happy Birthday, {card.recipientName}!
+      </h1>
+      <BubbleDisplay messages={messages} />
     </main>
   );
 }

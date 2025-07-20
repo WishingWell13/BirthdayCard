@@ -49,7 +49,7 @@ export default function EditMessages({ initialMessages, cardId, visitorName }: E
               </>
             ) : (
               <>
-                <div className="text-gray-800">{msg.messageText}</div>
+                <div className="text-gray-800 whitespace-pre-wrap">{msg.messageText}</div>
                 <button
                   className="mt-2 bg-pink-900 text-white font-semibold py-1 px-3 rounded"
                   onClick={() => {
