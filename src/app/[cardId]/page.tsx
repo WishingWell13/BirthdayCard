@@ -1,8 +1,8 @@
 import { kv } from '@vercel/kv';
-import { Card, Message } from '../../../types';
+import { Card } from '../../../types';
 import { Suspense } from 'react';
 import NameInput from '../../components/NameInput';
-import MessageForm from '../../components/MessageForm';
+// import MessageForm from '../../components/MessageForm';
 
 interface CardPageProps {
   params: { cardId: string };
@@ -16,21 +16,22 @@ export default async function CardPage({ params }: CardPageProps) {
   if (!rawMessages || rawMessages.length === 0) {
     rawMessages = await kv.lrange(`messages:${cardId}`, 0, -1);
   }
-  const messages: Message[] = rawMessages
-    ? rawMessages.map((msg: any) => {
-        if (typeof msg === 'string') {
-          try {
-            return JSON.parse(msg);
-          } catch {
-            return null;
-          }
-        }
-        if (typeof msg === 'object' && msg !== null) {
-          return msg;
-        }
-        return null;
-      }).filter(Boolean)
-    : [];
+  // If you need messages, use this pattern:
+  // const messages: Message[] = rawMessages
+  //   ? rawMessages.map((msg: unknown) => {
+  //       if (typeof msg === 'string') {
+  //         try {
+  //           return JSON.parse(msg);
+  //         } catch {
+  //           return null;
+  //         }
+  //       }
+  //       if (typeof msg === 'object' && msg !== null) {
+  //         return msg as Message;
+  //       }
+  //       return null;
+  //     }).filter(Boolean) as Message[]
+  //   : [];
 
   if (!card) {
     return (

@@ -14,6 +14,10 @@ interface NameInputProps {
 }
 
 export default function NameInput({ card, cardId }: NameInputProps) {
+  function handleMessagesDeleted(deletedMessages: Message[]) {
+    const deletedIds = new Set(deletedMessages.map(msg => msg.id));
+    setMessages(currentMessages => currentMessages.filter(msg => !deletedIds.has(msg.id)));
+  }
   const [visitorName, setVisitorName] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -68,7 +72,13 @@ export default function NameInput({ card, cardId }: NameInputProps) {
         <h2 className="text-2xl font-bold mb-2 bg-blue-900 text-white px-6 py-4 rounded shadow">
           Happy Birthday, {card.recipientName}!
         </h2>
-        <MessageList messages={messages} />
+        <MessageList
+          cardId={cardId}
+          recipientName={card.recipientName}
+          messages={messages}
+          isRecipient={true}
+          onMessagesDeleted={handleMessagesDeleted}
+        />
       </div>
     );
   }
