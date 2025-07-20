@@ -1,7 +1,12 @@
+"use client";
 import { useState } from 'react';
+import { useEffect } from 'react';
 import MessageForm from './MessageForm';
+import { saveMessage } from '../actions/saveMessage';
 import MessageList from './MessageList';
+import { getMessages } from '../actions/getMessages';
 import { Card } from '../../types';
+import type { Message } from '../../types';
 
 interface NameInputProps {
   card: Card;
@@ -12,6 +17,14 @@ export default function NameInput({ card, cardId }: NameInputProps) {
   const [visitorName, setVisitorName] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    // Only fetch messages if visitor is the recipient and has submitted their name
+    if (submitted && visitorName.trim().toLowerCase() === card.recipientName.trim().toLowerCase()) {
+      getMessages(cardId).then(setMessages);
+    }
+  }, [submitted, visitorName, card.recipientName, cardId]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,19 +39,19 @@ export default function NameInput({ card, cardId }: NameInputProps) {
   if (!submitted) {
     return (
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <label className="font-medium">Your Name</label>
+        <label className="font-medium text-black">Your Name</label>
         <input
           type="text"
           required
           value={visitorName}
           onChange={e => setVisitorName(e.target.value)}
-          className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="border border-black rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900 text-black bg-white placeholder-black/70"
           placeholder="e.g. John Smith"
         />
-        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {error && <div className="text-red-900 text-sm font-semibold">{error}</div>}
         <button
           type="submit"
-          className="mt-2 bg-blue-500 text-white font-semibold py-2 rounded hover:bg-blue-600 transition"
+          className="mt-2 bg-blue-900 text-white font-semibold py-2 rounded hover:bg-blue-950 transition"
         >
           Continue
         </button>
@@ -51,14 +64,14 @@ export default function NameInput({ card, cardId }: NameInputProps) {
     return (
       <div className="flex flex-col gap-6 items-center">
         <h2 className="text-2xl font-bold mb-2">Happy Birthday, {card.recipientName}!</h2>
-        <MessageList cardId={cardId} />
+        <MessageList messages={messages} />
       </div>
     );
   }
   return (
     <div className="flex flex-col gap-6 items-center">
       <h2 className="text-xl font-semibold mb-2">Leave a message for {card.recipientName}!</h2>
-      <MessageForm cardId={cardId} authorName={visitorName} />
+      <MessageForm cardId={cardId} authorName={visitorName} saveMessage={saveMessage} />
     </div>
   );
 }

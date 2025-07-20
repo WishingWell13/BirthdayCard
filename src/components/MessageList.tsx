@@ -1,24 +1,11 @@
-import { useEffect, useState } from 'react';
-import { kv } from '@vercel/kv';
 import { Message } from '../../types';
 
 interface MessageListProps {
-  cardId: string;
+  messages: Message[];
 }
 
-export default function MessageList({ cardId }: MessageListProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-
-  useEffect(() => {
-    async function fetchMessages() {
-      const rawMessages = await kv.lrange(`messages:${cardId}`, 0, -1);
-      const parsed = rawMessages.map((msg: string) => JSON.parse(msg));
-      setMessages(parsed);
-    }
-    fetchMessages();
-  }, [cardId]);
-
-  if (messages.length === 0) {
+export default function MessageList({ messages }: MessageListProps) {
+  if (!messages || messages.length === 0) {
     return <div className="text-gray-500">No messages yet. Be the first to leave one!</div>;
   }
 

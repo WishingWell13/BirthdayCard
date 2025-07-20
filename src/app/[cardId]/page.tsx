@@ -3,7 +3,6 @@ import { Card, Message } from '../../../types';
 import { Suspense } from 'react';
 import NameInput from '../../components/NameInput';
 import MessageForm from '../../components/MessageForm';
-import MessageList from '../../components/MessageList';
 
 interface CardPageProps {
   params: { cardId: string };
@@ -12,6 +11,26 @@ interface CardPageProps {
 export default async function CardPage({ params }: CardPageProps) {
   const cardId = params.cardId;
   const card: Card | null = await kv.get(`card:${cardId}`);
+  // Try both lrange and zrange for compatibility
+  let rawMessages = await kv.zrange(`messages:${cardId}`, 0, -1);
+  if (!rawMessages || rawMessages.length === 0) {
+    rawMessages = await kv.lrange(`messages:${cardId}`, 0, -1);
+  }
+  const messages: Message[] = rawMessages
+    ? rawMessages.map((msg: any) => {
+        if (typeof msg === 'string') {
+          try {
+            return JSON.parse(msg);
+          } catch {
+            return null;
+          }
+        }
+        if (typeof msg === 'object' && msg !== null) {
+          return msg;
+        }
+        return null;
+      }).filter(Boolean)
+    : [];
 
   if (!card) {
     return (
