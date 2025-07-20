@@ -1,7 +1,7 @@
 
 import { nanoid } from 'nanoid';
 import { redirect } from 'next/navigation';
-import { Card } from '../../types';
+import { Card } from '@/types';
 
 // Import Vercel KV client (assume @vercel/kv is installed and .env is configured)
 import { kv } from '@vercel/kv';

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Message } from '../../types';
+import type { Message } from '@/types';
 import { useState } from 'react';
 import { deleteMessages } from '../actions/deleteMessage';
 

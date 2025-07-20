@@ -1,6 +1,6 @@
 "use server";
 import { kv } from '@vercel/kv';
-import type { Message } from '../../types';
+import type { Message } from '@/types';
 
 export async function deleteMessages(cardId: string, recipientName: string, messages: Message[]): Promise<{ success: boolean; error?: string }> {
   // Fetch card details

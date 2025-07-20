@@ -1,6 +1,6 @@
 "use server";
 import { kv } from '@vercel/kv';
-import type { Message } from '../../types';
+import type { Message } from '@/types';
 
 export async function getMessages(cardId: string): Promise<Message[]> {
   const rawMessages = await kv.zrange(`messages:${cardId}`, 0, -1);

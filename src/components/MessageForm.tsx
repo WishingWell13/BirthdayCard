@@ -5,12 +5,13 @@ import { useState } from 'react';
 interface MessageFormProps {
   cardId: string;
   authorName: string;
-  saveMessage: (formData: FormData) => Promise<void>;
+  saveMessage?: (formData: FormData) => Promise<void>;
   onBackToCard?: () => void;
 }
 
 export default function MessageForm({ cardId, authorName, saveMessage, onBackToCard }: MessageFormProps) {
   const [submitted, setSubmitted] = useState(false);
+  const handleSave = saveMessage ?? (async () => {});
 
   if (submitted) {
     return (
@@ -31,7 +32,7 @@ export default function MessageForm({ cardId, authorName, saveMessage, onBackToC
 
   return (
     <form action={async (formData) => {
-      await saveMessage(formData);
+      await handleSave(formData);
       setSubmitted(true);
     }} className="flex flex-col gap-4">
       <input type="hidden" name="cardId" value={cardId} />

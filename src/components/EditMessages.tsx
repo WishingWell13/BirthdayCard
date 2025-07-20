@@ -1,0 +1,69 @@
+"use client";
+import { useState } from 'react';
+import { getUserMessages } from '../actions/getUserMessages';
+import { updateMessage } from '../actions/updateMessage';
+import type { Message } from '@/types';
+
+interface EditMessagesProps {
+  initialMessages: Message[];
+  cardId: string;
+  visitorName: string;
+}
+
+export default function EditMessages({ initialMessages, cardId, visitorName }: EditMessagesProps) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState<string>("");
+
+  return (
+    <div className="flex flex-col gap-6 items-center">
+      <h2 className="text-2xl font-bold mb-2 bg-blue-900 text-white px-6 py-4 rounded shadow">
+        Welcome back, {visitorName}! Edit your message(s):
+      </h2>
+      <ul className="w-full flex flex-col gap-4">
+        {messages.map(msg => (
+          <li key={msg.id} className="bg-gray-50 border rounded p-4 flex flex-col gap-2">
+            {editingId === msg.id ? (
+              <>
+                <textarea
+                  className="w-full border rounded p-2 text-black"
+                  value={editText}
+                  onChange={e => setEditText(e.target.value)}
+                />
+                <button
+                  className="mt-2 bg-blue-900 text-white font-semibold py-1 px-3 rounded"
+                  onClick={async () => {
+                    await updateMessage(cardId, msg.id, editText);
+                    setEditingId(null);
+                    getUserMessages(cardId, visitorName).then(setMessages);
+                  }}
+                >
+                  Save Changes
+                </button>
+                <button
+                  className="mt-2 ml-2 bg-gray-300 text-black font-semibold py-1 px-3 rounded"
+                  onClick={() => setEditingId(null)}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="text-gray-800">{msg.messageText}</div>
+                <button
+                  className="mt-2 bg-pink-900 text-white font-semibold py-1 px-3 rounded"
+                  onClick={() => {
+                    setEditingId(msg.id);
+                    setEditText(msg.messageText);
+                  }}
+                >
+                  Edit
+                </button>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
