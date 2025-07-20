@@ -1,12 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-
-export type Message = {
-  id: string;
-  authorName: string;
-  messageText: string;
-};
+import { Message } from "@/types";
 
 const COLORS = [
   "bg-sky-400",

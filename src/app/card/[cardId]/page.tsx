@@ -1,6 +1,6 @@
-import BubbleDisplay from '../../../components/BubbleDisplay';
 import { kv } from '@vercel/kv';
 import { Card, Message } from '@/types';
+import CardViewClient from './CardViewClient';
 
 export default async function CardViewPage({ params }: { params: Promise<{ cardId: string }> }) {
   const { cardId } = await params;
@@ -22,11 +22,10 @@ export default async function CardViewPage({ params }: { params: Promise<{ cardI
   }
 
   return (
-    <main className="w-screen h-screen bg-gradient-to-br from-blue-50 to-pink-50 relative">
-      <h1 className="absolute top-8 left-1/2 transform -translate-x-1/2 text-3xl font-bold text-pink-900 mb-6 text-center z-20">
-        Happy Birthday, {card.recipientName}!
-      </h1>
-      <BubbleDisplay messages={messages} />
-    </main>
+    <CardViewClient
+      messages={messages}
+      recipientName={card.recipientName}
+      cardId={cardId}
+    />
   );
 }
