@@ -5,11 +5,11 @@ import NameInput from '../../components/NameInput';
 // import MessageForm from '../../components/MessageForm';
 
 interface CardPageProps {
-  params: { cardId: string };
+  params: Promise<{ cardId: string }>;
 }
 
 export default async function CardPage({ params }: CardPageProps) {
-  const cardId = params.cardId;
+  const { cardId } = await params;
   const card: Card | null = await kv.get(`card:${cardId}`);
   // Try both lrange and zrange for compatibility
   let rawMessages = await kv.zrange(`messages:${cardId}`, 0, -1);
