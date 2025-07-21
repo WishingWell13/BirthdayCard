@@ -1,26 +1,30 @@
 "use client";
-import MessageForm from './MessageForm';
+
+import NewMessageServer from './NewMessageServer';
+import { useSearchParams } from 'next/navigation';
+
 
 interface NewMessageProps {
   cardId: string;
   authorName: string;
   recipientName: string;
-  saveMessage?: (formData: FormData) => Promise<void>;
   onBackToCard?: () => void;
+  submitted?: boolean;
 }
 
-export default function NewMessage({ cardId, authorName, recipientName, saveMessage, onBackToCard }: NewMessageProps) {
+
+export default function NewMessage({ cardId, authorName, recipientName, onBackToCard, submitted }: NewMessageProps) {
+  // If submitted is not provided, fall back to search param (for backward compatibility)
+  const searchParams = useSearchParams();
+  const isSubmitted = typeof submitted === 'boolean' ? submitted : searchParams.get('submitted') === '1';
   return (
-    <div className="flex flex-col gap-6 items-center">
-      <h2 className="text-xl font-semibold mb-2 bg-pink-900 text-white px-6 py-4 rounded shadow">
-        Leave a message for {recipientName}!
-      </h2>
-      <MessageForm
-        cardId={cardId}
-        authorName={authorName}
-        saveMessage={saveMessage}
-        onBackToCard={onBackToCard}
-      />
-    </div>
+    <NewMessageServer
+      cardId={cardId}
+      authorName={authorName}
+      recipientName={recipientName}
+      onBackToCard={onBackToCard}
+      submitted={isSubmitted}
+    />
   );
 }
+

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BubbleDisplay from "../../../components/BubbleDisplay";
 import MessageList from "../../../components/MessageList";
 import { Message } from "@/types";
@@ -12,6 +12,17 @@ interface CardViewClientProps {
 
 const CardViewClient: React.FC<CardViewClientProps> = ({ messages, recipientName, cardId }) => {
   const [viewMode, setViewMode] = useState<'bubble' | 'list'>('bubble');
+
+  useEffect(() => {
+    import('canvas-confetti').then((module) => {
+      const confetti = module.default;
+      confetti({
+        particleCount: 120,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+    });
+  }, []);
 
   return (
     <div className="relative w-screen h-screen">

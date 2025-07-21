@@ -1,7 +1,8 @@
+
 "use client";
 
+import React, { useState } from 'react';
 import type { Message } from '@/types';
-import { useState } from 'react';
 import { deleteMessages } from '../actions/deleteMessage';
 
 interface MessageListProps {
@@ -13,10 +14,20 @@ interface MessageListProps {
 }
 
 export default function MessageList({ cardId, recipientName, messages, isRecipient, onMessagesDeleted }: MessageListProps) {
+
   const [selected, setSelected] = useState<Message[]>([]);
   const [deleting, setDeleting] = useState(false);
 
-  if (!messages || messages.length === 0) {
+  // Deduplicate messages by id
+  const dedupedMessages = React.useMemo(() => {
+    const map = new Map<string, Message>();
+    messages.forEach(msg => {
+      map.set(msg.id, msg);
+    });
+    return Array.from(map.values());
+  }, [messages]);
+
+  if (!dedupedMessages || dedupedMessages.length === 0) {
     return <div className="text-gray-500">No messages yet. Be the first to leave one!</div>;
   }
 
@@ -52,7 +63,7 @@ export default function MessageList({ cardId, recipientName, messages, isRecipie
         </button>
       )}
       <ul className="flex flex-col gap-4 w-full">
-        {messages.map(msg => (
+        {dedupedMessages.map(msg => (
           <li key={msg.id} className="bg-gray-50 border rounded p-4 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               {isRecipient && (

@@ -2,6 +2,7 @@ export type Card = {
   id: string;
   recipientName: string;
   dob: string;
+  theme?: string;
 };
 
 export type Message = {

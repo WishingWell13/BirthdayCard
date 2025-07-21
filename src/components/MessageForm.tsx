@@ -1,19 +1,28 @@
 "use client";
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 
 interface MessageFormProps {
   cardId: string;
   authorName: string;
-  saveMessage?: (formData: FormData) => Promise<void>;
+  saveMessage: (formData: FormData) => Promise<void>;
   onBackToCard?: () => void;
 }
 
-export default function MessageForm({ cardId, authorName, saveMessage, onBackToCard }: MessageFormProps) {
-  const [submitted, setSubmitted] = useState(false);
-  const handleSave = saveMessage ?? (async () => {});
 
-  if (submitted) {
+export default function MessageForm({ cardId, authorName, saveMessage, onBackToCard }: MessageFormProps) {
+  const [showThankYou, setShowThankYou] = useState(false);
+  const router = useRouter();
+
+  // Handler to show thank you after submit
+  async function handleFormAction(formData: FormData) {
+    await saveMessage(formData);
+    setShowThankYou(true);
+    router.refresh();
+  }
+
+  if (showThankYou) {
     return (
       <div className="flex flex-col gap-4 items-center">
         <div className="text-green-600 font-semibold">Thank you for your message!</div>
@@ -31,10 +40,7 @@ export default function MessageForm({ cardId, authorName, saveMessage, onBackToC
   }
 
   return (
-    <form action={async (formData) => {
-      await handleSave(formData);
-      setSubmitted(true);
-    }} className="flex flex-col gap-4">
+    <form action={handleFormAction} className="flex flex-col gap-4">
       <input type="hidden" name="cardId" value={cardId} />
       <input type="hidden" name="authorName" value={authorName} />
       <label className="font-bold text-black bg-yellow-300 px-2 py-1 rounded">Your Message</label>

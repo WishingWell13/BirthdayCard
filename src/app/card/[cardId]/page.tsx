@@ -22,10 +22,12 @@ export default async function CardViewPage({ params }: { params: Promise<{ cardI
   }
 
   return (
-    <CardViewClient
-      messages={messages}
-      recipientName={card.recipientName}
-      cardId={cardId}
-    />
+    <div className={card.theme || 'light'}>
+      <CardViewClient
+        messages={messages}
+        recipientName={card.recipientName}
+        cardId={cardId}
+      />
+    </div>
   );
 }

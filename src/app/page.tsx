@@ -11,8 +11,9 @@ async function createCard(formData: FormData) {
   'use server';
   const recipientName = formData.get('recipientName') as string;
   const dob = formData.get('dob') as string;
+  const theme = (formData.get('theme') as string) || 'light';
   const id = nanoid();
-  const card: Card = { id, recipientName, dob };
+  const card: Card = { id, recipientName, dob, theme };
   await kv.set(`card:${id}`, card);
   redirect(`/link/${id}`);
 }
@@ -46,6 +47,21 @@ export default function Home() {
             required
             className="border border-black rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-900 text-black bg-white"
           />
+          <label className="font-medium text-black">Choose a Theme</label>
+          <div className="flex gap-4 mb-2">
+            <label className="flex items-center gap-2">
+              <input type="radio" name="theme" value="light" defaultChecked className="accent-blue-900" />
+              Light
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="theme" value="dark" className="accent-blue-900" />
+              Dark
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="theme" value="forest" className="accent-blue-900" />
+              Forest
+            </label>
+          </div>
           <button
             type="submit"
             className="mt-4 bg-blue-900 text-white font-semibold py-2 rounded hover:bg-blue-950 transition"

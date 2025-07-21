@@ -38,9 +38,18 @@ type BubbleDisplayProps = {
 
 const BubbleDisplay: React.FC<BubbleDisplayProps> = ({ messages }) => {
   const [selected, setSelected] = useState<Message | null>(null);
+  // Deduplicate messages by id
+  const dedupedMessages = React.useMemo(() => {
+    const map = new Map<string, Message>();
+    messages.forEach(msg => {
+      map.set(msg.id, msg);
+    });
+    return Array.from(map.values());
+  }, [messages]);
+
   // Generate deterministic bubble properties per message
   const bubbleProps = React.useMemo(() => {
-    return messages.map((msg) => {
+    return dedupedMessages.map((msg) => {
       const seed = msg.id;
       return {
         size: seededInt(seed + 'size', 32, 48),
@@ -50,9 +59,9 @@ const BubbleDisplay: React.FC<BubbleDisplayProps> = ({ messages }) => {
         duration: 10 + seededRandom(seed + 'duration') * 8,
       };
     });
-  }, [messages]);
+  }, [dedupedMessages]);
 
-  if (!messages || messages.length === 0) {
+  if (!dedupedMessages || dedupedMessages.length === 0) {
     return (
       <div className="flex items-center justify-center w-full h-screen bg-gradient-to-br from-sky-100 to-fuchsia-100">
         <span className="text-xl font-semibold text-gray-700">
@@ -64,7 +73,7 @@ const BubbleDisplay: React.FC<BubbleDisplayProps> = ({ messages }) => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {messages.map((msg, i) => {
+      {dedupedMessages.map((msg, i) => {
         const { size, color, left, top, duration } = bubbleProps[i];
         return (
           <motion.div
