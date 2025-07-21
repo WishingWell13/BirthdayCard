@@ -1,9 +1,10 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Message } from '@/types';
 import { deleteMessages } from '../actions/deleteMessage';
+import { deduplicateMessages } from '@/lib/utils';
 
 interface MessageListProps {
   cardId: string;
@@ -22,13 +23,15 @@ export default function MessageList({ cardId, recipientName, messages, isRecipie
 
   // Use localMessages if set, otherwise use messages from props
   const dedupedMessages = React.useMemo(() => {
-    const source = localMessages ?? messages;
-    const map = new Map<string, Message>();
-    source.forEach(msg => {
-      map.set(msg.id, msg);
-    });
-    return Array.from(map.values());
+    return deduplicateMessages(localMessages ?? messages);
   }, [messages, localMessages]);
+
+  // When the canonical messages prop from the parent changes, it becomes the new
+  // source of truth. This effect resets the local optimistic state, ensuring
+  // this component is in sync with its parent.
+  useEffect(() => {
+    setLocalMessages(null);
+  }, [messages]);
 
   if (!dedupedMessages || dedupedMessages.length === 0) {
     return <div className="text-gray-500">No messages yet. Be the first to leave one!</div>;
