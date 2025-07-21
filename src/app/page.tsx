@@ -2,6 +2,7 @@
 import { nanoid } from 'nanoid';
 import { redirect } from 'next/navigation';
 import { Card } from '@/types';
+import Link from 'next/link';
 
 // Import Vercel KV client (assume @vercel/kv is installed and .env is configured)
 import { kv } from '@vercel/kv';
@@ -21,6 +22,14 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-300 p-8">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-4 text-center text-black">Create a Birthday Card</h1>
+        <div className="mb-2 text-center">
+          <Link
+            href="/about"
+            className="text-sm text-blue-700 underline hover:text-blue-900 transition"
+          >
+            How does this work?
+          </Link>
+        </div>
         <form action={createCard} className="flex flex-col gap-4">
           <label className="font-medium text-black">Recipient&apos;s Name</label>
           <input
