@@ -13,19 +13,22 @@ interface MessageListProps {
   onMessagesDeleted?: (messages: Message[]) => void;
 }
 
-export default function MessageList({ cardId, recipientName, messages, isRecipient, onMessagesDeleted }: MessageListProps) {
 
+export default function MessageList({ cardId, recipientName, messages, isRecipient, onMessagesDeleted }: MessageListProps) {
   const [selected, setSelected] = useState<Message[]>([]);
   const [deleting, setDeleting] = useState(false);
+  const [localMessages, setLocalMessages] = useState<Message[] | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  // Deduplicate messages by id
+  // Use localMessages if set, otherwise use messages from props
   const dedupedMessages = React.useMemo(() => {
+    const source = localMessages ?? messages;
     const map = new Map<string, Message>();
-    messages.forEach(msg => {
+    source.forEach(msg => {
       map.set(msg.id, msg);
     });
     return Array.from(map.values());
-  }, [messages]);
+  }, [messages, localMessages]);
 
   if (!dedupedMessages || dedupedMessages.length === 0) {
     return <div className="text-gray-500">No messages yet. Be the first to leave one!</div>;
@@ -41,18 +44,36 @@ export default function MessageList({ cardId, recipientName, messages, isRecipie
 
   async function handleBatchDelete() {
     setDeleting(true);
-    const result = await deleteMessages(cardId, recipientName, selected);
-    setDeleting(false);
-    if (result.success && onMessagesDeleted) {
-      onMessagesDeleted(selected);
-      setSelected([]);
-    } else if (!result.success) {
-      alert(result.error || 'Failed to delete messages');
+    setDeleteError(null);
+    // Optimistically remove selected messages from UI
+    const prevMessages = localMessages ?? messages;
+    const selectedIds = new Set(selected.map(m => m.id));
+    const optimisticMessages = prevMessages.filter(msg => !selectedIds.has(msg.id));
+    setLocalMessages(optimisticMessages);
+
+    try {
+      const result = await deleteMessages(cardId, recipientName, selected);
+      setDeleting(false);
+      if (result.success && onMessagesDeleted) {
+        onMessagesDeleted(selected);
+        setSelected([]);
+        // Keep localMessages as is until parent updates props
+      } else if (!result.success) {
+        setLocalMessages(prevMessages); // revert
+        setDeleteError(result.error || 'Failed to delete messages');
+      }
+    } catch {
+      setLocalMessages(prevMessages); // revert
+      setDeleteError('Failed to delete messages');
+      setDeleting(false);
     }
   }
 
   return (
     <div className="flex flex-col gap-4 w-full">
+      {deleteError && (
+        <div className="text-red-600 font-semibold mb-2">{deleteError}</div>
+      )}
       {isRecipient && selected.length > 0 && (
         <button
           className="self-end bg-red-700 text-white px-4 py-2 rounded hover:bg-red-900 transition font-semibold mb-2"
