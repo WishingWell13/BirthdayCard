@@ -4,12 +4,13 @@ import Link from "next/link";
 
 
 
-export default function NameInput({ visitorName, setVisitorName, onSubmit, error, cardId }: {
+export default function NameInput({ visitorName, setVisitorName, onSubmit, error, cardId, isSubmitting }: {
   visitorName: string;
   setVisitorName: (name: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   error?: string;
   cardId: string;
+  isSubmitting?: boolean;
 }) {
   return (
     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
@@ -26,8 +27,9 @@ export default function NameInput({ visitorName, setVisitorName, onSubmit, error
       <button
         type="submit"
         className="mt-2 bg-blue-900 text-white font-semibold py-2 rounded hover:bg-blue-950 transition"
+        disabled={isSubmitting}
       >
-        Continue
+        {isSubmitting ? 'Submitting...' : 'Continue'}
       </button>
       {/* Always show Go to Card link for direct navigation */}
       {cardId && (

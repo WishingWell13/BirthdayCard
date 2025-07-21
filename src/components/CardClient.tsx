@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import NameInput from './NameInput';
 import EditMessages from './EditMessages';
 import NewMessage from './NewMessage';
 import { getUserMessages } from '../actions/getUserMessages';
+import { deduplicateMessages } from '@/lib/utils';
 import type { Card, Message } from '@/types';
 
 interface CardClientProps {
@@ -20,6 +21,7 @@ export default function CardClient({ card, cardId }: CardClientProps) {
   const [error, setError] = useState('');
   const [showThankYou, setShowThankYou] = useState(false);
   const [hasCheckedSubmitted, setHasCheckedSubmitted] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -37,32 +39,29 @@ export default function CardClient({ card, cardId }: CardClientProps) {
     setHasCheckedSubmitted(true);
   }, [searchParams, router]);
 
-  // Fetch messages after name submission
-  useEffect(() => {
-    if (nameSubmitted && visitorName.trim()) {
-      setLoading(true);
-      getUserMessages(cardId, visitorName)
-        .then(fetched => {
-          const deduped = Object.values(
-            fetched.reduce((acc, msg) => {
-              acc[msg.id] = msg;
-              return acc;
-            }, {} as Record<string, Message>)
-          );
-          setMessages(deduped);
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [nameSubmitted, visitorName, cardId]);
 
-  const handleNameSubmit = (e: React.FormEvent) => {
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     if (!visitorName.trim()) {
       setError('Please enter your name.');
+      isSubmittingRef.current = false;
       return;
     }
     setError('');
-    setNameSubmitted(true);
+    setLoading(true);
+    try {
+      const fetched = await getUserMessages(cardId, visitorName);
+      setMessages(deduplicateMessages(fetched));
+      setNameSubmitted(true);
+    } catch {
+      setError('Failed to fetch messages.');
+    } finally {
+      setLoading(false);
+      isSubmittingRef.current = false;
+    }
   };
 
   // Prevent UI flash: if ?submitted=1 is present and thank you not yet shown, render nothing
@@ -115,6 +114,7 @@ export default function CardClient({ card, cardId }: CardClientProps) {
           onSubmit={handleNameSubmit}
           error={error}
           cardId={cardId}
+          isSubmitting={isSubmittingRef.current}
         />
       ) : loading ? (
         <div className="text-center py-8">Loading...</div>

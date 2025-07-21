@@ -1,5 +1,7 @@
 
+
 import { serverAction } from '../actions/messageActions';
+import { SubmitButton } from './SubmitButton';
 
 
 interface MessageFormServerProps {
@@ -25,12 +27,7 @@ export default function MessageFormServer({ cardId, authorName }: MessageFormSer
         rows={4}
         placeholder="Write something nice..."
       />
-      <button
-        type="submit"
-        className="mt-2 bg-pink-500 text-white font-semibold py-2 rounded hover:bg-pink-600 transition"
-      >
-        Send Message
-      </button>
+      <SubmitButton />
     </form>
   );
 }
