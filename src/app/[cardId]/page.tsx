@@ -3,8 +3,8 @@ import CardClient from '../../components/CardClient';
 import { kv } from '@vercel/kv';
 import { Card } from '@/types';
 
-export default async function CardPage({ params }: { params: Promise<{ cardId: string }> }) {
-  const { cardId } = await await params;
+export default async function CardPage({ params }: { params: { cardId: string } }) {
+  const { cardId } = params;
   const card = await kv.get(`card:${cardId}`) as Card | null;
 
   // The rest of the logic (visitorName, submitted, messages, etc.) must be handled in a client component
